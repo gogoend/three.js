@@ -17,7 +17,7 @@ if ( !window.frameElement && window.location.protocol !== 'file:' ) {
 
 	}
 
-	var pathSnippet = href.slice( splitIndex, -5 );
+	var pathSnippet = href.slice( splitIndex, - 5 );
 
 	window.location.replace( docsBaseURL + '#' + pathSnippet + hash );
 
@@ -26,7 +26,7 @@ if ( !window.frameElement && window.location.protocol !== 'file:' ) {
 
 function onDocumentLoad( event ) {
 
-	var path;
+	var path, localizedPath;
 	var pathname = window.location.pathname;
 	var section = /\/(manual|api|examples)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
 	var name = /[\-A-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
@@ -34,18 +34,18 @@ function onDocumentLoad( event ) {
 	switch ( section ) {
 
 		case 'api':
-			path = /\/api\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 5 );
+			localizedPath = /\/api\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 5 );
 
 			// Remove localized part of the path (e.g. 'en/' or 'es-MX/'):
-			path = path.replace( /^[A-z0-9-]+\//, '' );
+			path = localizedPath.replace( /^[A-z0-9-]+\//, '' );
 
 			break;
 
 		case 'examples':
-			path = /\/examples\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 10 );
+			localizedPath = /\/examples\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 10 );
 
 			// Remove localized part of the path (e.g. 'en/' or 'es-MX/'):
-			path = path.replace( /^[A-z0-9-]+\//, '' );
+			path = localizedPath.replace( /^[A-z0-9-]+\//, '' );
 			
 			break;
 
@@ -53,7 +53,7 @@ function onDocumentLoad( event ) {
 			name = name.replace( /\-/g, ' ' );
 
 			path = pathname.replace( /\ /g, '-' );
-			path = /\/manual\/[-A-z0-9\/]+/.exec( path ).toString().substr( 8 );
+			path = localizedPath = /\/manual\/[-A-z0-9\/]+/.exec( path ).toString().substr( 8 );
 			break;
 
 	}
@@ -105,7 +105,7 @@ function onDocumentLoad( event ) {
 
 	button.addEventListener( 'click', function ( event ) {
 
-		window.open( 'https://github.com/mrdoob/three.js/blob/dev/docs/' + section + '/' + path + '.html' );
+		window.open( 'https://github.com/mrdoob/three.js/blob/dev/docs/' + section + '/' + localizedPath + '.html' );
 
 	}, false );
 
