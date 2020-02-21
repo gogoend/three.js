@@ -37,6 +37,7 @@ var TransformControls = function ( camera, domElement ) {
 	Object3D.call( this );
 
 	this.visible = false;
+	this.domElement = domElement;
 
 	var _gizmo = new TransformControlsGizmo();
 	this.add( _gizmo );
@@ -228,7 +229,17 @@ var TransformControls = function ( camera, domElement ) {
 		if ( this.object !== undefined ) {
 
 			this.object.updateMatrixWorld();
-			this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
+
+			if ( this.object.parent === null ) {
+
+				console.error( 'TransformControls: The attached 3D object must be a part of the scene graph.' );
+
+			} else {
+
+				this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
+
+			}
+
 			this.object.matrixWorld.decompose( worldPosition, worldQuaternion, worldScale );
 
 			parentQuaternionInv.copy( parentQuaternion ).inverse();
@@ -1086,7 +1097,7 @@ var TransformControlsGizmo = function () {
 				object.updateMatrix();
 
 				var tempGeometry = object.geometry.clone();
-				tempGeometry.applyMatrix( object.matrix );
+				tempGeometry.applyMatrix4( object.matrix );
 				object.geometry = tempGeometry;
 				object.renderOrder = Infinity;
 

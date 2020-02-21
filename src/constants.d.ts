@@ -48,12 +48,6 @@ export enum Shading {}
 export const FlatShading: Shading;
 export const SmoothShading: Shading;
 
-// colors
-export enum Colors {}
-export const NoColors: Colors;
-export const FaceColors: Colors;
-export const VertexColors: Colors;
-
 // blending modes
 export enum Blending {}
 export const NoBlending: Blending;
@@ -157,13 +151,10 @@ export const IntType: TextureDataType;
 export const UnsignedIntType: TextureDataType;
 export const FloatType: TextureDataType;
 export const HalfFloatType: TextureDataType;
-
-// Pixel types
-export enum PixelType {}
-export const UnsignedShort4444Type: PixelType;
-export const UnsignedShort5551Type: PixelType;
-export const UnsignedShort565Type: PixelType;
-export const UnsignedInt248Type: PixelType;
+export const UnsignedShort4444Type: TextureDataType;
+export const UnsignedShort5551Type: TextureDataType;
+export const UnsignedShort565Type: TextureDataType;
+export const UnsignedInt248Type: TextureDataType;
 
 // Pixel formats
 export enum PixelFormat {}
@@ -261,6 +252,8 @@ export const RGBA_PVRTC_2BPPV1_Format: CompressedPixelFormat;
 
 // ETC compressed texture formats
 export const RGB_ETC1_Format: CompressedPixelFormat;
+export const RGB_ETC2_Format: CompressedPixelFormat;
+export const RGBA_ETC2_EAC_Format: CompressedPixelFormat;
 
 // ASTC compressed texture formats
 export const RGBA_ASTC_4x4_Format: CompressedPixelFormat;
