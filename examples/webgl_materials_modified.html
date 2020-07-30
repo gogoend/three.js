@@ -4,71 +4,74 @@
 		<title>three.js webgl - materials - modified</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			a { color: #ffffff; }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			#webglmessage {
-				background:rgb(200,100,0) !important;
-				color:#fff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> wegbl - modified material.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> wegbl - modified material.
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var camera, scene, renderer, stats;
-
-			var materialShader;
 
 			init();
 			animate();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 1500;
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 20;
 
 				scene = new THREE.Scene();
+
+				var loader = new GLTFLoader();
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
+
+					var geometry = gltf.scene.children[ 0 ].geometry;
+
+					var mesh = new THREE.Mesh( geometry, buildTwistMaterial( 2.0 ) );
+					mesh.position.x = - 3.5;
+					mesh.position.y = - 0.5;
+					scene.add( mesh );
+
+					var mesh = new THREE.Mesh( geometry, buildTwistMaterial( - 2.0 ) );
+					mesh.position.x = 3.5;
+					mesh.position.y = - 0.5;
+					scene.add( mesh );
+
+				} );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1000;
+				controls.maxDistance = 5000;
+
+				//
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				// EVENTS
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function buildTwistMaterial( amount ) {
 
 				var material = new THREE.MeshNormalMaterial();
 				material.onBeforeCompile = function ( shader ) {
@@ -79,7 +82,7 @@
 					shader.vertexShader = shader.vertexShader.replace(
 						'#include <begin_vertex>',
 						[
-							'float theta = sin( time + position.y ) / 2.0;',
+							`float theta = sin( time + position.y ) / ${ amount.toFixed( 1 ) };`,
 							'float c = cos( theta );',
 							'float s = sin( theta );',
 							'mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );',
@@ -88,35 +91,19 @@
 						].join( '\n' )
 					);
 
-					materialShader = shader;
+					material.userData.shader = shader;
 
 				};
 
-				var loader = new THREE.GLTFLoader();
-				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
+				// Make sure WebGLRenderer doesnt reuse a single program
 
-					var mesh = new THREE.Mesh( gltf.scene.children[ 0 ].geometry, material );
-					mesh.position.y = - 50;
-					mesh.scale.setScalar( 100 );
-					scene.add( mesh );
+				material.customProgramCacheKey = function () {
 
-				} );
+					return amount;
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
+				};
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
-
-				//
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
-				// EVENTS
-
-				window.addEventListener( 'resize', onWindowResize, false );
+				return material;
 
 			}
 
@@ -148,11 +135,21 @@
 
 			function render() {
 
-				if ( materialShader ) {
+				scene.traverse( function ( child ) {
 
-					materialShader.uniforms.time.value = performance.now() / 1000;
+					if ( child.isMesh ) {
 
-				}
+						const shader = child.material.userData.shader;
+
+						if ( shader ) {
+
+							shader.uniforms.time.value = performance.now() / 1000;
+
+						}
+
+					}
+
+				} );
 
 				renderer.render( scene, camera );
 

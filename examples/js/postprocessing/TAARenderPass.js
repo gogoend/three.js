@@ -1,8 +1,7 @@
+console.warn( "THREE.TAARenderPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  *
  * Temporal Anti-Aliasing Render Pass
- *
- * @author bhouston / http://clara.io/
  *
  * When there is no motion in the scene, the TAA render pass accumulates jittered camera samples across frames to create a high quality anti-aliased result.
  *
@@ -12,7 +11,7 @@
  *
  */
 
-THREE.TAARenderPass = function ( scene, camera, params ) {
+THREE.TAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 
 	if ( THREE.SSAARenderPass === undefined ) {
 
@@ -20,7 +19,7 @@ THREE.TAARenderPass = function ( scene, camera, params ) {
 
 	}
 
-	THREE.SSAARenderPass.call( this, scene, camera, params );
+	THREE.SSAARenderPass.call( this, scene, camera, clearColor, clearAlpha );
 
 	this.sampleLevel = 0;
 	this.accumulate = false;

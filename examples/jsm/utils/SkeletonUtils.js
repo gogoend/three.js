@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br
- */
-
 import {
 	AnimationClip,
 	AnimationMixer,
@@ -14,8 +10,6 @@ import {
 	Vector3,
 	VectorKeyframeTrack
 } from "../../../build/three.module.js";
-
-'use strict';
 
 var SkeletonUtils = {
 
@@ -585,7 +579,7 @@ var SkeletonUtils = {
 };
 
 
-function parallelTraverse ( a, b, callback ) {
+function parallelTraverse( a, b, callback ) {
 
 	callback( a, b );
 

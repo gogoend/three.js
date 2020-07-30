@@ -1,7 +1,7 @@
+import { Geometry } from '../core/Geometry.js';
+import { ExtrudeBufferGeometry } from './ExtrudeGeometry.js';
+
 /**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * @author alteredq / http://alteredqualia.com/
- *
  * Text = 3D Text
  *
  * parameters = {
@@ -13,12 +13,10 @@
  *
  *  bevelEnabled: <bool>, // turn on bevel
  *  bevelThickness: <float>, // how deep into text bevel goes
- *  bevelSize: <float> // how far from text outline is bevel
+ *  bevelSize: <float>, // how far from text outline (including bevelOffset) is bevel
+ *  bevelOffset: <float> // how far from text outline does bevel start
  * }
  */
-
-import { Geometry } from '../core/Geometry.js';
-import { ExtrudeBufferGeometry } from './ExtrudeGeometry.js';
 
 // TextGeometry
 
@@ -47,7 +45,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	parameters = parameters || {};
 
-	var font = parameters.font;
+	const font = parameters.font;
 
 	if ( ! ( font && font.isFont ) ) {
 
@@ -56,7 +54,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	}
 
-	var shapes = font.generateShapes( text, parameters.size );
+	const shapes = font.generateShapes( text, parameters.size );
 
 	// translate parameters to ExtrudeGeometry API
 

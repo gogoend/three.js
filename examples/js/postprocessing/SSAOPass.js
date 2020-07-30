@@ -1,6 +1,4 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
+console.warn( "THREE.SSAOPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.SSAOPass = function ( scene, camera, width, height ) {
 
@@ -153,16 +151,16 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 		this.ssaoRenderTarget.dispose();
 		this.blurRenderTarget.dispose();
 
-		// dispose geometry
-
-		this.quad.geometry.dispose();
-
 		// dispose materials
 
 		this.normalMaterial.dispose();
 		this.blurMaterial.dispose();
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
+
+		// dipsose full screen quad
+
+		this.fsQuad.dispose();
 
 	},
 
@@ -197,7 +195,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.texture;
 				this.copyMaterial.blending = THREE.NoBlending;
-				this.renderPass( renderer, this.copyMaterial, null );
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
@@ -205,7 +203,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 				this.copyMaterial.blending = THREE.NoBlending;
-				this.renderPass( renderer, this.copyMaterial, null );
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
@@ -213,13 +211,13 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = THREE.NoBlending;
-				this.renderPass( renderer, this.copyMaterial, null );
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
 			case THREE.SSAOPass.OUTPUT.Depth:
 
-				this.renderPass( renderer, this.depthRenderMaterial, null );
+				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
@@ -227,7 +225,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
 				this.copyMaterial.blending = THREE.NoBlending;
-				this.renderPass( renderer, this.copyMaterial, null );
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
@@ -235,7 +233,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = THREE.NoBlending;
-				this.renderPass( renderer, this.copyMaterial, null );
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 				this.copyMaterial.blending = THREE.CustomBlending;
@@ -344,7 +342,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 			sample.normalize();
 
 			var scale = i / kernelSize;
-			scale = THREE.Math.lerp( 0.1, 1, scale * scale );
+			scale = THREE.MathUtils.lerp( 0.1, 1, scale * scale );
 			sample.multiplyScalar( scale );
 
 			kernel.push( sample );
@@ -357,13 +355,13 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		var width = 4, height = 4;
 
-		if ( SimplexNoise === undefined ) {
+		if ( THREE.SimplexNoise === undefined ) {
 
 			console.error( 'THREE.SSAOPass: The pass relies on THREE.SimplexNoise.' );
 
 		}
 
-		var simplex = new SimplexNoise();
+		var simplex = new THREE.SimplexNoise();
 
 		var size = width * height;
 		var data = new Float32Array( size * 4 );
@@ -388,7 +386,6 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 		this.noiseTexture = new THREE.DataTexture( data, width, height, THREE.RGBAFormat, THREE.FloatType );
 		this.noiseTexture.wrapS = THREE.RepeatWrapping;
 		this.noiseTexture.wrapT = THREE.RepeatWrapping;
-		this.noiseTexture.needsUpdate = true;
 
 	}
 

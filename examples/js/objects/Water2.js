@@ -1,6 +1,5 @@
+console.warn( "THREE.Water2: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author Mugen87 / https://github.com/Mugen87
- *
  * References:
  *	http://www.valvesoftware.com/publications/2010/siggraph2010_vlachos_waterflow.pdf
  * 	http://graphicsrunner.blogspot.de/2010/08/water-using-flow-maps.html
@@ -26,6 +25,7 @@ THREE.Water = function ( geometry, options ) {
 	var reflectivity = options.reflectivity || 0.02;
 	var scale = options.scale || 1;
 	var shader = options.shader || THREE.Water.WaterShader;
+	var encoding = options.encoding !== undefined ? options.encoding : THREE.LinearEncoding;
 
 	var textureLoader = new THREE.TextureLoader();
 
@@ -57,13 +57,15 @@ THREE.Water = function ( geometry, options ) {
 	var reflector = new THREE.Reflector( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
-		clipBias: clipBias
+		clipBias: clipBias,
+		encoding: encoding
 	} );
 
 	var refractor = new THREE.Refractor( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
-		clipBias: clipBias
+		clipBias: clipBias,
+		encoding: encoding
 	} );
 
 	reflector.matrixAutoUpdate = false;
@@ -236,7 +238,9 @@ THREE.Water.WaterShader = {
 
 	vertexShader: [
 
+		'#include <common>',
 		'#include <fog_pars_vertex>',
+		'#include <logdepthbuf_pars_vertex>',
 
 		'uniform mat4 textureMatrix;',
 
@@ -255,6 +259,7 @@ THREE.Water.WaterShader = {
 		'	vec4 mvPosition =  viewMatrix * worldPosition;', // used in fog_vertex
 		'	gl_Position = projectionMatrix * mvPosition;',
 
+		'	#include <logdepthbuf_vertex>',
 		'	#include <fog_vertex>',
 
 		'}'
@@ -265,6 +270,7 @@ THREE.Water.WaterShader = {
 
 		'#include <common>',
 		'#include <fog_pars_fragment>',
+		'#include <logdepthbuf_pars_fragment>',
 
 		'uniform sampler2D tReflectionMap;',
 		'uniform sampler2D tRefractionMap;',
@@ -286,6 +292,8 @@ THREE.Water.WaterShader = {
 		'varying vec3 vToEye;',
 
 		'void main() {',
+
+		'	#include <logdepthbuf_fragment>',
 
 		'	float flowMapOffset0 = config.x;',
 		'	float flowMapOffset1 = config.y;',

@@ -1,5 +1,5 @@
+console.warn( "THREE.AdaptiveToneMappingPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author miibond
  * Generate a texture that represents the luminosity of the current scene, adapted over time
  * to simulate the optic nerve responding to the amount of light it is receiving.
  * Based on a GDC2007 presentation by Wolfgang Engel titled "Post-Processing Pipeline"
@@ -125,7 +125,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 	constructor: THREE.AdaptiveToneMappingPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime/*, maskActive*/ ) {
 
 		if ( this.needsInit ) {
 
@@ -183,7 +183,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 	},
 
-	reset: function ( renderer ) {
+	reset: function () {
 
 		// render targets
 		if ( this.luminanceRT ) {
@@ -191,11 +191,13 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.luminanceRT.dispose();
 
 		}
+
 		if ( this.currentLuminanceRT ) {
 
 			this.currentLuminanceRT.dispose();
 
 		}
+
 		if ( this.previousLuminanceRT ) {
 
 			this.previousLuminanceRT.dispose();
@@ -213,7 +215,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 		this.previousLuminanceRT.texture.generateMipmaps = false;
 
 		// We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
-		pars.minFilter = THREE.LinearMipMapLinearFilter;
+		pars.minFilter = THREE.LinearMipmapLinearFilter;
 		pars.generateMipmaps = true;
 		this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
 		this.currentLuminanceRT.texture.name = "AdaptiveToneMappingPass.cl";
@@ -224,6 +226,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.texture;
 
 		}
+
 		//Put something in the adaptive luminance texture so that the scene can render initially
 		this.fsQuad.material = new THREE.MeshBasicMaterial( { color: 0x777777 } );
 		this.materialLuminance.needsUpdate = true;
@@ -250,6 +253,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.materialToneMap.uniforms.luminanceMap.value = null;
 
 		}
+
 		this.materialToneMap.needsUpdate = true;
 
 	},
@@ -312,31 +316,37 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 			this.luminanceRT.dispose();
 
 		}
+
 		if ( this.previousLuminanceRT ) {
 
 			this.previousLuminanceRT.dispose();
 
 		}
+
 		if ( this.currentLuminanceRT ) {
 
 			this.currentLuminanceRT.dispose();
 
 		}
+
 		if ( this.materialLuminance ) {
 
 			this.materialLuminance.dispose();
 
 		}
+
 		if ( this.materialAdaptiveLum ) {
 
 			this.materialAdaptiveLum.dispose();
 
 		}
+
 		if ( this.materialCopy ) {
 
 			this.materialCopy.dispose();
 
 		}
+
 		if ( this.materialToneMap ) {
 
 			this.materialToneMap.dispose();
